@@ -1,14 +1,15 @@
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.JPanel;
 
-public class GameBackGround extends JPanel {
+public class GameBackGround extends JPanel implements SnakeActListener {
 	
 	
 	//记录当前蛋的坐标
-	static private Point eggLocation;
+	private Point eggLocation;
 	
 	private Egg egg;
 	
@@ -16,14 +17,17 @@ public class GameBackGround extends JPanel {
 	
 	private int mgridSideLength;
 	
-	static private int mgridNumberPerSide = 50;
-	static private int msideLength = 700;
+	final static private int mgridNumberPerSide = 50;
+	final static private int msideLength = 700;
+	final static private int moveSpeed = 100;
+	
+	Timer timer = new Timer();
 	
 	private Yard yard;
 	
 	
 	public GameBackGround() {
-		// TODO Auto-generated constructor stub
+
 		mgridSideLength = msideLength/mgridNumberPerSide;
 		
 		yard = new Yard(msideLength, mgridNumberPerSide);
@@ -34,7 +38,8 @@ public class GameBackGround extends JPanel {
 		addEgg();
 		initSnakeBody();
 		
-		Timer timer = new Timer();
+		snake.snakeMove();
+		
 		timer.schedule(new TimerTask() {
 			
 			@Override
@@ -45,25 +50,56 @@ public class GameBackGround extends JPanel {
 				}
 				
 			}
-		}, 70, 70);;
+		}, moveSpeed, moveSpeed);
 	}
 	
 	
 	private void initSnakeBody() {
 		snake = new Snake(mgridSideLength,new Point(10, 10),yard);
+		snake.setEatListener(this);
 		
 	}
 	
-	//内部类方法
+	public void eatEgg(Point snakeHeadLocation){
+		
+		if (snakeHeadLocation.equals(eggLocation)) {
+			
+			addEgg();
+			snake.growUp();
+		}
+	}
+	
+	@Override
+	public void snakeMoveState(ArrayList<SnakeBody> snakeBodies) {
+		// TODO Auto-generated method stub
+		Point snakeHeadLocation = snakeBodies.get(0).getLocation();
+		if (snakeHeadLocation.x < 0 ||snakeHeadLocation.y < 0
+				||snakeHeadLocation.x > msideLength || snakeHeadLocation.y > msideLength) {
+			gameOver();
+		}
+		
+		for (SnakeBody snakeBody : snakeBodies) {
+			if (snakeBody.getLocation().equals(snakeHeadLocation)) {
+				//gameOver();
+			}
+		}
+	}
+	
+	private void gameOver() {
+		timer.cancel();
+	}
+	
 	private void addEgg() {
-		if (egg == null) {
-			int random_X = (int)(Math.random() * mgridNumberPerSide);
-			int random_Y = (int)(Math.random() * mgridNumberPerSide);
-			eggLocation = new Point(random_X * mgridSideLength, random_Y * mgridSideLength);
+		
+		int random_X = (int)(Math.random() * mgridNumberPerSide);
+		int random_Y = (int)(Math.random() * mgridNumberPerSide);
+		eggLocation = new Point(random_X * mgridSideLength, random_Y * mgridSideLength);
+		
+		if (egg == null) {	
+			
 			egg = new Egg(mgridSideLength);
-			egg.setLocation(eggLocation);
 			yard.add(egg);
 		}
+		egg.setLocation(eggLocation);
 	}	
-
 }

@@ -18,8 +18,6 @@ public class Yard extends JPanel{
 	public Yard(int sideLength,int gridNumberPerSide) {
 		super();
 		
-		System.out.println(gridNumberPerSide);
-		
 		mgridNumberPerSide = gridNumberPerSide;
 		msideLength = sideLength;
 		
@@ -29,8 +27,6 @@ public class Yard extends JPanel{
 		this.setLayout(null);
 	}
 	
-	
-	//外部调用类方法
 	
 	@Override
 	public void paint(Graphics g) {
